@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Weather Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 dark:from-gray-900 dark:via-purple-900 dark:to-violet-900 min-h-screen transition-colors duration-300">
+    
+    <!-- Navigation -->
+    <nav class="bg-white/10 backdrop-blur-md border-b border-white/20 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-cloud-sun text-2xl text-white mr-3"></i>
+                    <h1 class="text-xl font-bold text-white">Weather Dashboard</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="theme-toggle" class="p-2 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors">
+                        <i class="fas fa-sun" id="theme-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Search Section -->
+        <div class="mb-8">
+            <div class="max-w-md mx-auto">
+                <div class="relative">
+                    <input type="text" 
+                           id="city-search" 
+                           placeholder="Enter city name..." 
+                           class="w-full px-4 py-3 pl-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70"></i>
+                </div>
+                <button id="search-btn" 
+                        class="w-full mt-4 px-6 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-2xl text-white font-medium transition-colors border border-white/30">
+                    <i class="fas fa-search mr-2"></i>Search Weather
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="hidden text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+            <p class="text-white mt-4">Loading weather data...</p>
+        </div>
+
+        <!-- Current Weather Card -->
+        <div id="current-weather" class="hidden mb-8">
+            <div class="bg-white/20 backdrop-blur-md rounded-3xl p-6 border border-white/30">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 id="city-name" class="text-2xl font-bold text-white"></h2>
+                        <p id="current-date" class="text-white/80"></p>
+                    </div>
+                    <div class="text-right">
+                        <img id="weather-icon" src="" alt="" class="w-16 h-16 mx-auto">
+                        <p id="weather-description" class="text-white/80 capitalize"></p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <p class="text-4xl font-bold text-white" id="temperature"></p>
+                        <p class="text-white/80">Temperature</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-semibold text-white" id="feels-like"></p>
+                        <p class="text-white/80">Feels Like</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-semibold text-white" id="humidity"></p>
+                        <p class="text-white/80">Humidity</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-semibold text-white" id="wind-speed"></p>
+                        <p class="text-white/80">Wind Speed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7-Day Forecast -->
+        <div id="forecast-section" class="hidden">
+            <h3 class="text-2xl font-bold text-white mb-6 text-center">7-Day Forecast</h3>
+            <div id="forecast-container" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4">
+                <!-- Forecast cards will be generated here -->
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="hidden text-center py-8">
+            <div class="bg-red-500/20 backdrop-blur-md rounded-2xl p-6 border border-red-500/30 max-w-md mx-auto">
+                <i class="fas fa-exclamation-triangle text-red-300 text-3xl mb-4"></i>
+                <p class="text-red-300 font-medium" id="error-text"></p>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="/js/weather.js"></script>
+</body>
+</html>
