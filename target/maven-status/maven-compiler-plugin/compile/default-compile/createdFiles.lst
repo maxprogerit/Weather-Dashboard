@@ -1,0 +1,13 @@
+com\weatherdashboard\controller\WeatherApiController.class
+com\weatherdashboard\model\WeatherData$Wind.class
+com\weatherdashboard\model\WeatherData$Weather.class
+com\weatherdashboard\model\ForecastData$City.class
+com\weatherdashboard\model\ForecastData.class
+com\weatherdashboard\model\WeatherData.class
+com\weatherdashboard\controller\HomeController.class
+com\weatherdashboard\WeatherDashboardApplication.class
+com\weatherdashboard\service\WeatherService.class
+com\weatherdashboard\model\WeatherData$Clouds.class
+com\weatherdashboard\model\WeatherData$Main.class
+com\weatherdashboard\model\WeatherData$Sys.class
+com\weatherdashboard\model\ForecastData$ForecastItem.class
