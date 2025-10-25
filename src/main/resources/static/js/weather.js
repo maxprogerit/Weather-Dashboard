@@ -146,17 +146,45 @@ class WeatherDashboard {
 
     displayCurrentWeather(data) {
         document.getElementById('city-name').textContent = `${data.name}, ${data.sys.country}`;
-        document.getElementById('temperature').textContent = `${Math.round(data.main.temp)}°C`;
+        document.getElementById('temperature').textContent = `${Math.round(data.main.temp)}`;
         document.getElementById('feels-like').textContent = `${Math.round(data.main.feels_like)}°C`;
         document.getElementById('humidity').textContent = `${data.main.humidity}%`;
         document.getElementById('wind-speed').textContent = `${Math.round(data.wind.speed * 3.6)} km/h`;
         document.getElementById('weather-description').textContent = data.weather[0].description;
         
+        // Add pressure and visibility if available
+        if (data.main.pressure) {
+            document.getElementById('pressure').textContent = `${data.main.pressure} hPa`;
+        }
+        if (data.visibility) {
+            document.getElementById('visibility').textContent = `${Math.round(data.visibility / 1000)} km`;
+        }
+        
         const iconUrl = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
         document.getElementById('weather-icon').src = iconUrl;
 
+        // Update API status
+        this.updateApiStatus('success', 'API Connection Successful');
+
         document.getElementById('current-weather').classList.remove('hidden');
         document.getElementById('error-message').classList.add('hidden');
+    }
+
+    updateApiStatus(status, message) {
+        const statusElement = document.getElementById('api-status');
+        const statusDot = statusElement.querySelector('div');
+        const statusText = statusElement.querySelector('span');
+        
+        if (status === 'success') {
+            statusDot.className = 'w-3 h-3 bg-green-500 rounded-full';
+            statusText.textContent = message;
+        } else if (status === 'error') {
+            statusDot.className = 'w-3 h-3 bg-red-500 rounded-full animate-pulse';
+            statusText.textContent = message;
+        } else {
+            statusDot.className = 'w-3 h-3 bg-yellow-500 rounded-full animate-pulse';
+            statusText.textContent = message;
+        }
     }
 
     displayForecast(data) {
@@ -203,19 +231,35 @@ class WeatherDashboard {
         const dayDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
         const card = document.createElement('div');
-        card.className = 'bg-white/20 backdrop-blur-md rounded-2xl p-4 border border-white/30 text-center';
+        card.className = 'weather-card rounded-2xl p-6 text-center hover-lift animate-fade-in';
         
         card.innerHTML = `
-            <p class="text-white font-semibold mb-2">${dayName}</p>
-            <p class="text-white/80 text-sm mb-3">${dayDate}</p>
-            <img src="https://openweathermap.org/img/wn/${forecast.weather[0].icon}.png" 
-                 alt="${forecast.weather[0].description}" 
-                 class="w-12 h-12 mx-auto mb-2">
-            <p class="text-white font-bold text-lg">${Math.round(forecast.main.temp)}°C</p>
-            <p class="text-white/80 text-sm capitalize">${forecast.weather[0].description}</p>
-            <div class="mt-2 text-xs text-white/70">
-                <p>H: ${Math.round(forecast.main.temp_max)}°C</p>
-                <p>L: ${Math.round(forecast.main.temp_min)}°C</p>
+            <div class="mb-4">
+                <p class="text-white font-bold text-lg mb-1">${dayName}</p>
+                <p class="text-gray-400 text-sm">${dayDate}</p>
+            </div>
+            <div class="mb-4">
+                <img src="https://openweathermap.org/img/wn/${forecast.weather[0].icon}@2x.png" 
+                     alt="${forecast.weather[0].description}" 
+                     class="w-16 h-16 mx-auto">
+            </div>
+            <div class="mb-4">
+                <p class="text-2xl font-bold gradient-text mb-2">${Math.round(forecast.main.temp)}°C</p>
+                <p class="text-gray-300 text-sm capitalize leading-relaxed">${forecast.weather[0].description}</p>
+            </div>
+            <div class="flex justify-between text-sm pt-4 border-t border-gray-700">
+                <div class="text-center">
+                    <p class="text-gray-400">High</p>
+                    <p class="text-white font-semibold">${Math.round(forecast.main.temp_max)}°</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-gray-400">Low</p>
+                    <p class="text-white font-semibold">${Math.round(forecast.main.temp_min)}°</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-gray-400">Humidity</p>
+                    <p class="text-white font-semibold">${forecast.main.humidity}%</p>
+                </div>
             </div>
         `;
 
@@ -238,7 +282,47 @@ class WeatherDashboard {
         document.getElementById('error-message').classList.remove('hidden');
         document.getElementById('current-weather').classList.add('hidden');
         document.getElementById('forecast-section').classList.add('hidden');
+        
+        // Update API status
+        this.updateApiStatus('error', 'API Connection Failed');
     }
+}
+
+// Test connection function
+async function testConnection() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<i class="fas fa-spinner animate-spin mr-2"></i>Testing...';
+    button.disabled = true;
+    
+    try {
+        const response = await fetch('/api/weather/current?city=London');
+        
+        if (response.ok) {
+            button.innerHTML = '<i class="fas fa-check mr-2"></i>Connection OK';
+            button.className = 'px-6 py-3 bg-green-500 hover:bg-green-600 rounded-xl text-white transition-colors';
+            
+            // Update API status
+            const dashboard = new WeatherDashboard();
+            dashboard.updateApiStatus('success', 'API is working correctly');
+        } else {
+            throw new Error(`HTTP ${response.status}`);
+        }
+    } catch (error) {
+        button.innerHTML = '<i class="fas fa-times mr-2"></i>Connection Failed';
+        button.className = 'px-6 py-3 bg-red-500 hover:bg-red-600 rounded-xl text-white transition-colors';
+        
+        // Update API status
+        const dashboard = new WeatherDashboard();
+        dashboard.updateApiStatus('error', `Connection failed: ${error.message}`);
+    }
+    
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        button.className = 'px-6 py-3 bg-primary-500 hover:bg-primary-600 rounded-xl text-white transition-colors';
+        button.disabled = false;
+    }, 3000);
 }
 
 // Initialize the weather dashboard when the page loads

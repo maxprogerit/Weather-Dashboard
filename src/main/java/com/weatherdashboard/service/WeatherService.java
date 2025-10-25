@@ -28,6 +28,17 @@ public class WeatherService {
         return webClient.get()
                 .uri(url)
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError(), 
+                    clientResponse -> clientResponse.bodyToMono(String.class)
+                        .map(body -> {
+                            if (clientResponse.statusCode().value() == 401) {
+                                return new RuntimeException("API key is invalid or not yet activated. Please wait up to 2 hours for new keys to become active.");
+                            } else if (clientResponse.statusCode().value() == 404) {
+                                return new RuntimeException("City not found. Please check the spelling and try again.");
+                            } else {
+                                return new RuntimeException("Request failed: " + body);
+                            }
+                        }))
                 .bodyToMono(WeatherData.class);
     }
 
@@ -37,6 +48,17 @@ public class WeatherService {
         return webClient.get()
                 .uri(url)
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError(), 
+                    clientResponse -> clientResponse.bodyToMono(String.class)
+                        .map(body -> {
+                            if (clientResponse.statusCode().value() == 401) {
+                                return new RuntimeException("API key is invalid or not yet activated. Please wait up to 2 hours for new keys to become active.");
+                            } else if (clientResponse.statusCode().value() == 404) {
+                                return new RuntimeException("City not found. Please check the spelling and try again.");
+                            } else {
+                                return new RuntimeException("Request failed: " + body);
+                            }
+                        }))
                 .bodyToMono(ForecastData.class);
     }
 
@@ -46,6 +68,15 @@ public class WeatherService {
         return webClient.get()
                 .uri(url)
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError(), 
+                    clientResponse -> clientResponse.bodyToMono(String.class)
+                        .map(body -> {
+                            if (clientResponse.statusCode().value() == 401) {
+                                return new RuntimeException("API key is invalid or not yet activated. Please wait up to 2 hours for new keys to become active.");
+                            } else {
+                                return new RuntimeException("Location request failed: " + body);
+                            }
+                        }))
                 .bodyToMono(WeatherData.class);
     }
 }
